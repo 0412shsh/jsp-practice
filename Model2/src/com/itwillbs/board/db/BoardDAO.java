@@ -201,6 +201,76 @@ public class BoardDAO {
 	}
 	// 글 목록 조회(all) - getBoardList()
 	
+	// 글 목록 조회 - getBoardList(int startRow,int pageSize)
+	public List<BoardDTO> getBoardList(int startRow,int pageSize){
+		System.out.println("\n DAO : getBoardList(int startRow,int pageSize) 호출");
+		
+		// 글정보 모두를 저장하는 배열(가변길이)
+//		ArrayList<BoardDTO> boardList = new ArrayList<BoardDTO>();
+		List<BoardDTO> boardList = new ArrayList<BoardDTO>();
+		
+		try {
+			// 1. 드라이버로드
+			// 2. 디비연결
+			con = getConnect();
+			// 3. sql 작성 & pstmt 객체
+			//sql = "select * from itwill_board"; (x)
+			
+			// limit 시작행-1,개수  : 시작 지점부터 해당 개수만큼 짤라오기
+			// 정렬 : re_ref 내림차순, re_seq 오름차순
+			
+			sql = "select * from itwill_board order by re_ref desc, re_seq asc "
+					+ "limit ?,?";
+			
+			pstmt = con.prepareStatement(sql);
+			
+			// ????
+			pstmt.setInt(1, startRow-1); // 시작행 - 1
+			pstmt.setInt(2, pageSize);
+			
+			// 4. sql 실행
+			rs = pstmt.executeQuery();
+			
+			// 5. 데이터 처리
+			while(rs.next()){
+				// 데이터 있을때 DB에 저장된 정보를 DTO저장 -> List 저장
+				
+				// DB -> DTO 저장
+				BoardDTO dto = new BoardDTO();
+				dto.setBno(rs.getInt("bno"));
+				dto.setContent(rs.getString("content"));
+				dto.setDate(rs.getDate("date"));
+				dto.setFile(rs.getString("file"));
+				dto.setIp(rs.getString("ip"));
+				dto.setName(rs.getString("name"));
+				dto.setPass(rs.getString("pass"));
+				dto.setRe_lev(rs.getInt("re_lev"));
+				dto.setRe_ref(rs.getInt("re_ref"));
+				dto.setRe_seq(rs.getInt("re_seq"));
+				dto.setReadcount(rs.getInt("readcount"));
+				dto.setSubject(rs.getString("subject"));
+				
+				// DTO -> List
+				boardList.add(dto);
+				
+			}// while
+			
+			System.out.println(" DAO : 게시판 목록 모두 저장완료 ");
+			//System.out.println(" C : "+boardList);			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeDB();
+		}
+		
+		return boardList;
+	}
+	// 글 목록 조회- getBoardList(int startRow,int pageSize)
+	
+	
+	
+	
 
 	// 글 개수 조회(all) - getBoardCount()
 	public int getBoardCount(){

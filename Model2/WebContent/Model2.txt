@@ -1,0 +1,101 @@
+Model2.txt
+
+   JSP -> java(Servlet) -> class 
+
+
+  Model2방식의 개발
+   => MVC 패턴을 사용하여 개발
+   
+   M : model => 데이터베이스와 연동, 처리 로직 부분 (java)
+              POJO(Plain Old Java Object) : 그냥자바파일
+   V : view => 화면 구현(jsp)
+   C : controller => model , view 연결 동작(servlet)
+   
+   
+   =>  관심사의 분리 / 업무를 분리 (잘처리한다)
+   
+   => 패턴을 사용하는 이유? 역활에 맞는 동작을 수행하기위함
+   
+   
+   
+   MVC
+   
+   사용자   ->   Controller   ->  Model  <-> MySQL
+   					|
+   					View
+   					
+   MVC (FrontController)
+   
+   사용자  ->  FrontController(Servlet)  -> Controller(java) -> Model(DAO) <-> MySQL
+   				    |			         	/
+   				          View(view)
+   
+   
+ 
+ 
+ CREATE TABLE `jspdb`.`itwill_board` (
+  `bno` INT NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  `pass` VARCHAR(45) NOT NULL,
+  `subject` VARCHAR(100) NOT NULL,
+  `content` VARCHAR(2000) NOT NULL,
+  `readcount` INT NULL,
+  `re_ref` INT NULL,
+  `re_lev` INT NULL,
+  `re_seq` INT NULL,
+  `date` DATE NULL,
+  `ip` VARCHAR(45) NULL,
+  `file` VARCHAR(200) NULL,
+  PRIMARY KEY (`bno`));
+ 
+ 
+ * 커넥션풀 (Connection Pool)
+  디비 연결정보(Connection)를 매번 생성하는것이 아니라, 
+  pool에 저장후 사용, 사용 후 반납해서 재사용
+   => 호출마다 연결정보를 생성,해제를 막기위해서
+   
+   1) service() 메서드당 1개의 pool을 생성한다(백터 형태)
+   2) 커넥션의 개수를 제한한다.
+   3) 커넥션 객체를 다 사용후 자원을 회수
+   
+   
+   클라이언트 요청  -> 할당할 커넥션이 있는지 체크 (pool) 
+     -> 커넥션이 있을때 -> 커넥션 객체 사용 (sql 실행) 
+     -> 커넥션을 반환
+     
+  클라이언트 요청  -> 할당할 커넥션이 있는지 체크 (pool) 
+     -> 커넥션이 없을때 -> 커넥션 객체를 대기(반환할때 까지),
+                           대기시간을 넘었을경우 임시 커넥션을 생성
+                           
+   * 라이브러리 설치
+       commons-collections4-4.4.jar  
+        => 자카르타 DBCP API 처리                   
+       commons-dbcp2-2.9.0.jar
+        =>  DBCP API 처리
+  	   commons-pool2-2.11.1.jar
+  	    =>  Pool API 처리 
+  	    
+  	    
+context.xml	    
+<Context> : 프로젝트
+	<Resource   // 정보
+	   name="jdbc/model2"   정보의 이름 
+	   auth="Container"     자원관리자 (Container(tomcat)/Application)
+	   type="javax.sql.DataSource"   리소스를 실제로 사용하는 타입
+	   driverClassName="com.mysql.cj.jdbc.Driver"    드라이버명
+	   username="root"    디비 계정
+	   password="1234"    디비 비밀번호
+	   url="jdbc:mysql://localhost:3306/jspdb"    디비 주소 
+	   maxWait="5000" 	 최대 대기시간 (5초)
+	/>
+</Context>
+ 
+ 
+ 
+ 
+ 
+ 
+   
+   
+   
+
